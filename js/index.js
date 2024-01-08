@@ -8,8 +8,8 @@ let canvas = document.querySelector("canvas");
 let ctx = canvas.getContext("2d");
 
 // Sprite dimensions in spritesheet (in px)
-const spriteWidth = 46;
-const spriteHeight = 45;
+const spriteWidth = 32;
+const spriteHeight = 32;
 // Used to multiple sprite scale since it's a tiny pixel art.
 const scale = 2;
 const scaledSpriteWidth = scale * spriteWidth;
@@ -36,15 +36,27 @@ function drawFrame(frameX, frameY, canvasX, canvasY) {
 
 window.requestAnimationFrame(step);
 
-// Index is each "frame" of animation
-const walkingAnimationLoop = [2, 3, 4, 5, 6];
+// Index is each "frame" of animation. Our sprite sheet has 3 frames per animation.
+const animationFrames = [0, 1, 2];
 let currentLoopIndex = 0;
 let frameCount = 0;
 const nextFrameThreshold = 15;
 
+/**
+ * Clear canvas before drawing next animation frame to
+ * prevens "stacking"/presisting previous draws.
+ * */
+function clearCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
 function step() {
-  // Since requestAnimationFrame is called to match screen refresh rate, animation matches that speed (ex: 60fps)
-  // Manually slow it down to 1 frame every 15 seconds
+  /**
+   * Since requestAnimationFrame is called to match screen refresh rate,
+   * canvas is redrawn at same speed. The animations are super simple,
+   * so only change animation frame after a given threshold of refreshes
+   * so it doesn't flip out!
+   */
   frameCount++;
   if (frameCount < nextFrameThreshold) {
     window.requestAnimationFrame(step);
@@ -52,11 +64,11 @@ function step() {
   }
   frameCount = 0;
 
-  // Clear canvas before drawing next animation frame. Prevents "stacking"/presistent of previous draws.
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawFrame(walkingAnimationLoop[currentLoopIndex], 0, 0, 0);
+  clearCanvas();
+
+  drawFrame(animationFrames[currentLoopIndex], 3, 0, 0);
   currentLoopIndex++;
-  if (currentLoopIndex >= walkingAnimationLoop.length) {
+  if (currentLoopIndex >= animationFrames.length) {
     currentLoopIndex = 0;
   }
   window.requestAnimationFrame(step);
